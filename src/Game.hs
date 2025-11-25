@@ -156,7 +156,27 @@ showPlayerBoard pst = header ++ "\n" ++ rows
     
 {- Exercise 4: Displaying the player's view of the opponent's board -}
 showOpponentBoard :: PlayerState ->  String
-showOpponentBoard _ = error "Fill me in"
+showOpponentBoard pst = header ++ "\n" ++ rows
+  where
+    (numRows, numCols) = psBoardSize pst
+
+    header = "  " ++ unwords [padColNumber c | c <- [0..numCols - 1]]
+    
+    padColNumber :: Int -> String
+    padColNumber n = if n < 10 then " " ++ show n ++ " " else " " ++ show n
+
+    rows = unlines [renderRow r | r <- [0..numRows - 1]]
+
+    renderRow :: Int -> String
+    renderRow r = rowLabel ++ " " ++ unwords [renderCell (r, c) | c <- [0..numCols - 1]]
+      where
+        rowLabel = [chr (65 + r)]
+
+    renderCell :: CoOrdinate -> String
+    renderCell coord
+        | coord `elem` psOpponentHits pst   = "xxx"
+        | coord `elem` psOpponentMisses pst = "000"
+        | otherwise                         = "???"
 
 {- Exercise 5: Ship placement -}
 placeShip :: PlayerState -> Ship -> CoOrdinate -> Direction -> Maybe PlayerState
