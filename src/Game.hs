@@ -8,7 +8,7 @@ import Common
 
 {- Definitions of data structures and some useful helpers -}
 data AIState = MkAIState { aiGenerator :: StdGen }
-
+    deriving Show      
 initAIState :: IO AIState
 initAIState = fmap MkAIState initStdGen
 
@@ -95,6 +95,7 @@ data GameState = MkGameState {
     gameP2State  :: PlayerState,
     gameAIState  :: AIState
 }
+    deriving Show
 
 mkGameState :: PlayerState -> PlayerState -> AIState -> GameState
 mkGameState p1State p2State aiState = MkGameState {
