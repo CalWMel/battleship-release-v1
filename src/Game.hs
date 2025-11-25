@@ -1,0 +1,144 @@
+{- Main data structures and game logic -}
+module Game where
+import Data.Char (chr)
+import Data.Foldable
+import Data.Maybe
+import System.Random
+import Common
+
+{- Definitions of data structures and some useful helpers -}
+data AIState = MkAIState { aiGenerator :: StdGen }
+
+initAIState :: IO AIState
+initAIState = fmap MkAIState initStdGen
+
+data Player = PlayerOne | PlayerTwo
+    deriving (Eq)
+
+advanceTurn :: Player -> Player
+advanceTurn PlayerOne = PlayerTwo
+advanceTurn PlayerTwo = PlayerOne
+
+instance Show Player where
+    show PlayerOne = "Player 1"
+    show PlayerTwo = "Player 2"
+
+data Ship = Carrier | Battleship | Cruiser | Submarine | Destroyer
+    deriving (Show, Eq)
+
+allShips :: [Ship]
+allShips = [Carrier, Battleship, Cruiser, Submarine, Destroyer]
+
+-- Number of squares taken up by a piece
+shipSize :: Ship -> Size
+shipSize Carrier = 5
+shipSize Battleship = 4
+shipSize Cruiser = 3
+shipSize Submarine = 3
+shipSize Destroyer = 2
+
+-- Two-letter code for each ship
+shipCode :: Ship -> String
+shipCode Carrier = "Ca"
+shipCode Battleship = "Bs"
+shipCode Cruiser = "Cr"
+shipCode Submarine = "Sb"
+shipCode Destroyer = "Ds"
+
+data Direction = DirUp | DirDown | DirLeft | DirRight
+    deriving (Show, Eq)
+
+type Size = Int
+type Range = (CoOrdinate, CoOrdinate)
+
+-- Result of a command
+data Result = 
+        Hit
+      | Miss
+      | Sunk Ship
+      deriving (Eq)
+
+instance Show Result where
+    show Hit = "Hit!"
+    show Miss = "Miss!"
+    show (Sunk ship) = "Sunk the opponent's " ++ show ship ++ "!"
+
+type BoardSize = (Int, Int)
+
+-- State of the game from the point of view of the player
+data PlayerState = MkPlayerState {
+    -- Board size
+    psBoardSize :: BoardSize,
+    -- Player's ship placements
+    psShips :: [(Ship, Range)],
+    -- Player's hits on the opponent's grid
+    psOpponentHits :: [CoOrdinate],
+    -- Player's misses on the opponent's grid
+    psOpponentMisses :: [CoOrdinate],
+    -- Hits on player's own ships
+    psSelfHits :: [CoOrdinate]
+}
+    deriving Show
+
+emptyPlayerState :: BoardSize -> PlayerState
+emptyPlayerState size = MkPlayerState {
+        psBoardSize = size,
+        psShips = [],
+        psOpponentHits = [],
+        psOpponentMisses = [],
+        psSelfHits = []
+    }
+
+-- State of a game that's in progress
+data GameState = MkGameState { 
+    gameP1State  :: PlayerState,
+    gameP2State  :: PlayerState,
+    gameAIState  :: AIState
+}
+
+mkGameState :: PlayerState -> PlayerState -> AIState -> GameState
+mkGameState p1State p2State aiState = MkGameState {
+    gameP1State = p1State,
+    gameP2State = p2State,
+    gameAIState = aiState
+}
+
+{- Exercise 1: Helper functions -}
+
+expandRange :: Range -> [CoOrdinate]
+expandRange _ = error "Fill me in"
+
+inRange :: CoOrdinate -> Range -> Bool
+inRange _ _ = error "Fill me in"
+
+lookupShip :: PlayerState -> CoOrdinate -> Maybe (Ship, Range)
+lookupShip _ _ = error "Fill me in"
+
+{- Exercise 2: Win checking -}
+checkWin :: GameState -> Maybe Player
+checkWin _ = error "Fill me in"
+
+{- Exercise 3: Displaying the player's board -}
+showPlayerBoard :: PlayerState -> String
+showPlayerBoard _ = error "Fill me in"
+    
+{- Exercise 4: Displaying the player's view of the opponent's board -}
+showOpponentBoard :: PlayerState ->  String
+showOpponentBoard _ = error "Fill me in"
+
+{- Exercise 5: Ship placement -}
+placeShip :: PlayerState -> Ship -> CoOrdinate -> Direction -> Maybe PlayerState
+placeShip _ _ _ _ = error "Fill me in"
+
+{- Exercise 6: Firing -}
+fire :: GameState -> Player -> CoOrdinate -> Either GameError (Result, GameState)
+fire _ _ _ = error "Fill me in" 
+
+{- Exercise 7: Board randomisation -}
+randomBoard :: BoardSize -> StdGen -> PlayerState
+randomBoard _ _ = error "Fill me in"
+
+{- Exercise 8: Random move -}
+makeRandomAIMove :: AIState -> PlayerState -> (CoOrdinate, AIState)
+makeRandomAIMove _ _ = error "Fill me in"
+
