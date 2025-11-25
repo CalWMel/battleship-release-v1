@@ -112,7 +112,7 @@ inRange :: CoOrdinate -> Range -> Bool
 inRange (r, c) ((r1, c1), (r2, c2)) = r >= r1 && r <= r2 && c >= c1 && c <= c2
 
 lookupShip :: PlayerState -> CoOrdinate -> Maybe (Ship, Range)
-lookupShip _ _ = error "Fill me in"
+lookupShip pst coord = find (\(s, r) -> inRange coord r) (psShips pst)
 
 {- Exercise 2: Win checking -}
 checkWin :: GameState -> Maybe Player
