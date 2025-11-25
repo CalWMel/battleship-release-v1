@@ -117,20 +117,43 @@ lookupShip pst coord = find (\(s, r) -> inRange coord r) (psShips pst)
 {- Exercise 2: Win checking -}
 checkWin :: GameState -> Maybe Player
 checkWin gs
-    | allSunk (gameP1State gs) = Just PlayerTwo -- If P1's ships are all sunk, P2 wins
-    | allSunk (gameP2State gs) = Just PlayerOne -- If P2's ships are all sunk, P1 wins
+    | allSunk (gameP1State gs) = Just PlayerTwo 
+    | allSunk (gameP2State gs) = Just PlayerOne
     | otherwise                = Nothing
   where
-    -- Helper to check if a single player has lost
     allSunk :: PlayerState -> Bool
     allSunk pst = all (\coord -> coord `elem` psSelfHits pst) allShipCoords
       where
-        -- Get a flat list of every coordinate occupied by a ship
         allShipCoords = concatMap (expandRange . snd) (psShips pst)
 
 {- Exercise 3: Displaying the player's board -}
 showPlayerBoard :: PlayerState -> String
-showPlayerBoard _ = error "Fill me in"
+showPlayerBoard pst = header ++ "\n" ++ rows
+  where
+    (numRows, numCols) = psBoardSize pst
+
+    header = "  " ++ unwords [padColNumber c | c <- [0..numCols - 1]]
+    
+    padColNumber :: Int -> String
+    padColNumber n = if n < 10 then " " ++ show n ++ " " else " " ++ show n
+
+    
+    rows = unlines [renderRow r | r <- [0..numRows - 1]]
+
+    renderRow :: Int -> String
+    renderRow r = rowLabel ++ " " ++ unwords [renderCell (r, c) | c <- [0..numCols - 1]]
+      where
+        rowLabel = [chr (ord 'A' + r)]
+
+    renderCell :: CoOrdinate -> String
+    renderCell coord =
+        case lookupShip pst coord of
+            Nothing -> "~~~"
+            Just (ship, _) -> 
+                let 
+                    code = shipCode ship 
+                    status = if coord `elem` psSelfHits pst then 'x' else 'o'
+                in code ++ [status]
     
 {- Exercise 4: Displaying the player's view of the opponent's board -}
 showOpponentBoard :: PlayerState ->  String
