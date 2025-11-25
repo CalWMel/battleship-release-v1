@@ -272,7 +272,5 @@ makeRandomAIMove :: AIState -> PlayerState -> (CoOrdinate, AIState)
 makeRandomAIMove (MkAIState gen) pst = ((r, c), MkAIState genNext)
   where
     (rows, cols) = psBoardSize pst
-    -- Generate random row
     (r, gen1) = randomR (0, rows - 1) gen
-    -- Generate random column
     (c, genNext) = randomR (0, cols - 1) gen1
