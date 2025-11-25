@@ -116,7 +116,17 @@ lookupShip pst coord = find (\(s, r) -> inRange coord r) (psShips pst)
 
 {- Exercise 2: Win checking -}
 checkWin :: GameState -> Maybe Player
-checkWin _ = error "Fill me in"
+checkWin gs
+    | allSunk (gameP1State gs) = Just PlayerTwo -- If P1's ships are all sunk, P2 wins
+    | allSunk (gameP2State gs) = Just PlayerOne -- If P2's ships are all sunk, P1 wins
+    | otherwise                = Nothing
+  where
+    -- Helper to check if a single player has lost
+    allSunk :: PlayerState -> Bool
+    allSunk pst = all (\coord -> coord `elem` psSelfHits pst) allShipCoords
+      where
+        -- Get a flat list of every coordinate occupied by a ship
+        allShipCoords = concatMap (expandRange . snd) (psShips pst)
 
 {- Exercise 3: Displaying the player's board -}
 showPlayerBoard :: PlayerState -> String
