@@ -142,7 +142,7 @@ showPlayerBoard pst = header ++ "\n" ++ rows
     renderRow :: Int -> String
     renderRow r = rowLabel ++ " " ++ unwords [renderCell (r, c) | c <- [0..numCols - 1]]
       where
-        rowLabel = [['A'..] !! r]
+        rowLabel = [chr (65 + r)]
 
     renderCell :: CoOrdinate -> String
     renderCell coord =
