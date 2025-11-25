@@ -180,7 +180,36 @@ showOpponentBoard pst = header ++ "\n" ++ rows
 
 {- Exercise 5: Ship placement -}
 placeShip :: PlayerState -> Ship -> CoOrdinate -> Direction -> Maybe PlayerState
-placeShip _ _ _ _ = error "Fill me in"
+placeShip pst ship (r, c) dir = 
+    if validRange && noOverlap
+    then Just (pst { psShips = (ship, range) : psShips pst })
+    else Nothing
+  where
+    (rows, cols) = psBoardSize pst
+    size = shipSize ship
+    
+    rawRange :: Range
+    rawRange = case dir of
+        DirUp    -> ((r - size + 1, c), (r, c))
+        DirDown  -> ((r, c), (r + size - 1, c))
+        DirLeft  -> ((r, c - size + 1), (r, c))
+        DirRight -> ((r, c), (r, c + size - 1))
+
+    range :: Range
+    range = 
+        let ((r1, c1), (r2, c2)) = rawRange
+        in ((min r1 r2, min c1 c2), (max r1 r2, max c1 c2))
+
+    validRange :: Bool
+    validRange = 
+        let ((r1, c1), (r2, c2)) = range
+        in r1 >= 0 && r2 < rows && c1 >= 0 && c2 < cols
+
+    noOverlap :: Bool
+    noOverlap = not (any isOccupied (expandRange range))
+      where
+        isOccupied :: CoOrdinate -> Bool
+        isOccupied coord = isJust (lookupShip pst coord)
 
 {- Exercise 6: Firing -}
 fire :: GameState -> Player -> CoOrdinate -> Either GameError (Result, GameState)
