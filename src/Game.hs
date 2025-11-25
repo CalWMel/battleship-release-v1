@@ -109,7 +109,7 @@ expandRange :: Range -> [CoOrdinate]
 expandRange ((r1, c1), (r2, c2)) = [(r, c) | r <- [r1..r2], c <- [c1..c2]]
 
 inRange :: CoOrdinate -> Range -> Bool
-inRange _ _ = error "Fill me in"
+inRange (r, c) ((r1, c1), (r2, c2)) = r >= r1 && r <= r2 && c >= c1 && c <= c2
 
 lookupShip :: PlayerState -> CoOrdinate -> Maybe (Ship, Range)
 lookupShip _ _ = error "Fill me in"
