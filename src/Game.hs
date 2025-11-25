@@ -250,15 +250,12 @@ randomBoard :: BoardSize -> StdGen -> PlayerState
 randomBoard size gen = placeShips allShips (emptyPlayerState size) gen
   where
     placeShips :: [Ship] -> PlayerState -> StdGen -> PlayerState
-    placeShips [] pst _ = pst -- No ships left? Done!
+    placeShips [] pst _ = pst
     placeShips (ship:rest) pst g =
         let 
             (rows, cols) = size
-            -- 1. Generate random Row
             (r, g1) = randomR (0, rows - 1) g
-            -- 2. Generate random Column
             (c, g2) = randomR (0, cols - 1) g1
-            -- 3. Generate random Direction (0 = Up, 1 = Down, 2 = Left, 3 = Right)
             (dInt, g3) = randomR (0, 3 :: Int) g2
             dir = case dInt of
                     0 -> DirUp
@@ -266,12 +263,16 @@ randomBoard size gen = placeShips allShips (emptyPlayerState size) gen
                     2 -> DirLeft
                     _ -> DirRight
         in 
-            -- 4. Try to place the ship
             case placeShip pst ship (r, c) dir of
-                Just pst' -> placeShips rest pst' g3      -- Success! Next ship.
-                Nothing   -> placeShips (ship:rest) pst g3 -- Fail! Retry same ship.
+                Just pst' -> placeShips rest pst' g3
+                Nothing   -> placeShips (ship:rest) pst g3
 
 {- Exercise 8: Random move -}
 makeRandomAIMove :: AIState -> PlayerState -> (CoOrdinate, AIState)
-makeRandomAIMove _ _ = error "Fill me in"
-
+makeRandomAIMove (MkAIState gen) pst = ((r, c), MkAIState genNext)
+  where
+    (rows, cols) = psBoardSize pst
+    -- Generate random row
+    (r, gen1) = randomR (0, rows - 1) gen
+    -- Generate random column
+    (c, genNext) = randomR (0, cols - 1) gen1
