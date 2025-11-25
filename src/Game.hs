@@ -106,7 +106,7 @@ mkGameState p1State p2State aiState = MkGameState {
 {- Exercise 1: Helper functions -}
 
 expandRange :: Range -> [CoOrdinate]
-expandRange _ = error "Fill me in"
+expandRange ((r1, c1), (r2, c2)) = [(r, c) | r <- [r1..r2], c <- [c1..c2]]
 
 inRange :: CoOrdinate -> Range -> Bool
 inRange _ _ = error "Fill me in"
