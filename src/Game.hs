@@ -247,7 +247,29 @@ fire gs player coord
 
 {- Exercise 7: Board randomisation -}
 randomBoard :: BoardSize -> StdGen -> PlayerState
-randomBoard _ _ = error "Fill me in"
+randomBoard size gen = placeShips allShips (emptyPlayerState size) gen
+  where
+    placeShips :: [Ship] -> PlayerState -> StdGen -> PlayerState
+    placeShips [] pst _ = pst -- No ships left? Done!
+    placeShips (ship:rest) pst g =
+        let 
+            (rows, cols) = size
+            -- 1. Generate random Row
+            (r, g1) = randomR (0, rows - 1) g
+            -- 2. Generate random Column
+            (c, g2) = randomR (0, cols - 1) g1
+            -- 3. Generate random Direction (0 = Up, 1 = Down, 2 = Left, 3 = Right)
+            (dInt, g3) = randomR (0, 3 :: Int) g2
+            dir = case dInt of
+                    0 -> DirUp
+                    1 -> DirDown
+                    2 -> DirLeft
+                    _ -> DirRight
+        in 
+            -- 4. Try to place the ship
+            case placeShip pst ship (r, c) dir of
+                Just pst' -> placeShips rest pst' g3      -- Success! Next ship.
+                Nothing   -> placeShips (ship:rest) pst g3 -- Fail! Retry same ship.
 
 {- Exercise 8: Random move -}
 makeRandomAIMove :: AIState -> PlayerState -> (CoOrdinate, AIState)
