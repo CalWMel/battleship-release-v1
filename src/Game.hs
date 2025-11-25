@@ -137,13 +137,12 @@ showPlayerBoard pst = header ++ "\n" ++ rows
     padColNumber :: Int -> String
     padColNumber n = if n < 10 then " " ++ show n ++ " " else " " ++ show n
 
-    
     rows = unlines [renderRow r | r <- [0..numRows - 1]]
 
     renderRow :: Int -> String
     renderRow r = rowLabel ++ " " ++ unwords [renderCell (r, c) | c <- [0..numCols - 1]]
       where
-        rowLabel = [chr (ord 'A' + r)]
+        rowLabel = [['A'..] !! r]
 
     renderCell :: CoOrdinate -> String
     renderCell coord =
