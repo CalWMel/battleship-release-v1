@@ -213,7 +213,36 @@ placeShip pst ship (r, c) dir =
 
 {- Exercise 6: Firing -}
 fire :: GameState -> Player -> CoOrdinate -> Either GameError (Result, GameState)
-fire _ _ _ = error "Fill me in" 
+fire gs player coord
+    | not validCoord = Left InvalidCoOrdinate
+    | alreadyFired   = Left AlreadyHit
+    | otherwise      = Right (result, newGameState)
+  where
+    (shooter, target, updateGameState) = case player of
+        PlayerOne -> (gameP1State gs, gameP2State gs, \s t -> gs { gameP1State = s, gameP2State = t })
+        PlayerTwo -> (gameP2State gs, gameP1State gs, \s t -> gs { gameP2State = s, gameP1State = t })
+
+    (rows, cols) = psBoardSize shooter
+    (r, c) = coord
+    validCoord = r >= 0 && r < rows && c >= 0 && c < cols
+
+    alreadyFired = coord `elem` psOpponentHits shooter || coord `elem` psOpponentMisses shooter
+
+    (result, newShooter, newTarget) = case lookupShip target coord of
+        Nothing -> 
+            (Miss, shooter { psOpponentMisses = coord : psOpponentMisses shooter }, target)
+        
+        Just (ship, range) ->
+            let 
+                updatedTarget = target { psSelfHits = coord : psSelfHits target }
+                updatedShooter = shooter { psOpponentHits = coord : psOpponentHits shooter }
+                
+                shipCoords = expandRange range
+                isSunk = all (\c -> c `elem` psSelfHits updatedTarget) shipCoords
+            in 
+                (if isSunk then Sunk ship else Hit, updatedShooter, updatedTarget)
+
+    newGameState = updateGameState newShooter newTarget
 
 {- Exercise 7: Board randomisation -}
 randomBoard :: BoardSize -> StdGen -> PlayerState
